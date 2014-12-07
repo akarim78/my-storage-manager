@@ -36,7 +36,6 @@ public class StorageDropboxActivity extends ActionBarActivity {
 	private FileListAdapter adapter;
 
 	private ArrayAdapter<CharSequence> mSpinnerAdapter;
-	private CharSequence[] gotoLocations;
 	private ListView fileListView;
 
 	// No need to change these, leave them alone.
@@ -73,7 +72,8 @@ public class StorageDropboxActivity extends ActionBarActivity {
 				// session
 				mApi.getSession().finishAuthentication();
 				String accessToken = mApi.getSession().getOAuth2AccessToken();
-				currentDir = new FileListEntry("/", "", "/", "0", "", true);
+
+				currentDir = new FileListEntry("/", null, "/", "", "", true);
 				new FetchListing().execute("/");
 			} catch (IllegalStateException e) {
 				Log.i("DbAuthLog", "Error authenticating", e);
@@ -88,6 +88,7 @@ public class StorageDropboxActivity extends ActionBarActivity {
 			try {
 				Entry dirent = mApi.metadata(params[0], 1000, null, true, null);
 				files = new ArrayList<FileListEntry>();
+
 				for (Entry ent : dirent.contents) {
 					FileListEntry fle = new FileListEntry(ent.path,
 							ent.parentPath(), ent.fileName(), ent.size,
@@ -95,6 +96,9 @@ public class StorageDropboxActivity extends ActionBarActivity {
 					files.add(fle);
 					Log.e(TAG, fle.toString());
 				}
+				currentDir = new FileListEntry(dirent.path,
+						dirent.parentPath(), dirent.fileName(), dirent.size,
+						dirent.modified, true);
 				return "";
 			} catch (DropboxException e) {
 				e.printStackTrace();
@@ -115,7 +119,7 @@ public class StorageDropboxActivity extends ActionBarActivity {
 
 					if (selected.isDir()) {
 						new FetchListing().execute(selected.getPath());
-						currentDir = selected;
+//						currentDir = selected;
 					} else {
 						// show properties
 					}
