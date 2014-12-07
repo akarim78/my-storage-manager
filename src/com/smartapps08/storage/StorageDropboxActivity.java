@@ -1,20 +1,17 @@
 package com.smartapps08.storage;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -34,9 +31,7 @@ public class StorageDropboxActivity extends ActionBarActivity {
 	final static private String APP_SECRET = "po3t94byh11hurs";
 	final static private AccessType ACCESS_TYPE = AccessType.DROPBOX;
 
-	private static final String CURRENT_DIR_DIR = "current-dir";
-
-	private File currentDir;
+	private FileListEntry currentDir;
 	private List<FileListEntry> files;
 	private FileListAdapter adapter;
 
@@ -77,10 +72,9 @@ public class StorageDropboxActivity extends ActionBarActivity {
 				// Required to complete auth, sets the access token on the
 				// session
 				mApi.getSession().finishAuthentication();
-
 				String accessToken = mApi.getSession().getOAuth2AccessToken();
-				Log.d(TAG, "Auth done: " + accessToken);
-				new FetchListing().execute("check");
+				currentDir = new FileListEntry("/", "", "/", "0", "", true);
+				new FetchListing().execute("/");
 			} catch (IllegalStateException e) {
 				Log.i("DbAuthLog", "Error authenticating", e);
 			}
@@ -92,7 +86,7 @@ public class StorageDropboxActivity extends ActionBarActivity {
 		@Override
 		protected String doInBackground(String... params) {
 			try {
-				Entry dirent = mApi.metadata("/", 1000, null, true, null);
+				Entry dirent = mApi.metadata(params[0], 1000, null, true, null);
 				files = new ArrayList<FileListEntry>();
 				for (Entry ent : dirent.contents) {
 					FileListEntry fle = new FileListEntry(ent.path,
@@ -101,7 +95,6 @@ public class StorageDropboxActivity extends ActionBarActivity {
 					files.add(fle);
 					Log.e(TAG, fle.toString());
 				}
-
 				return "";
 			} catch (DropboxException e) {
 				e.printStackTrace();
@@ -114,7 +107,36 @@ public class StorageDropboxActivity extends ActionBarActivity {
 			super.onPostExecute(result);
 			adapter = new FileListAdapter(StorageDropboxActivity.this, files);
 			fileListView.setAdapter(adapter);
+			fileListView.setOnItemClickListener(new OnItemClickListener() {
+
+				public void onItemClick(AdapterView<?> parent, View view,
+						int position, long id) {
+					FileListEntry selected = files.get(position);
+
+					if (selected.isDir()) {
+						new FetchListing().execute(selected.getPath());
+						currentDir = selected;
+					} else {
+						// show properties
+					}
+				}
+
+			});
 		}
+
+	}
+
+	@Override
+	public void onBackPressed() {
+		// if (getPreferenceHelper().useBackNavigation()) {
+		if (currentDir.getPath().equals("/")) {
+			finish();
+		} else {
+			new FetchListing().execute(currentDir.getParentPath());
+		}
+		// } else {
+		// super.onBackPressed();
+		// }
 
 	}
 
