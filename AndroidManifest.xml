@@ -17,13 +17,17 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.smartapps08.storage.StorageDropboxActivity"
+            android:name="GoogleDriveActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="com.smartapps08.storage.StorageDropboxActivity"
+            android:label="@string/app_name" >
         </activity>
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
@@ -46,11 +50,6 @@
             android:enabled="true"
             android:exported="false"
             android:label="Dropbox Sync" />
-
-        <activity
-            android:name="GoogleDriveActivity"
-            android:label="@string/app_name" >
-        </activity>
     </application>
 
 </manifest>
