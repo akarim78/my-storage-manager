@@ -2,6 +2,7 @@ package com.smartapps08.adapters;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,6 @@ import android.widget.TextView;
 
 import com.smartapps08.model.FileListEntry;
 import com.smartapps08.storage.R;
-import com.smartapps08.storage.StorageDropboxActivity;
 import com.smartapps08.util.Util;
 
 public class FileListAdapter extends BaseAdapter {
@@ -25,11 +25,11 @@ public class FileListAdapter extends BaseAdapter {
 
 	private static final String TAG = FileListAdapter.class.getName();
 
-	private StorageDropboxActivity mContext;
+	private Activity mContext;
 	private List<FileListEntry> files;
 	private LayoutInflater mInflater;
 
-	public FileListAdapter(StorageDropboxActivity context,
+	public FileListAdapter(Activity context,
 			List<FileListEntry> files) {
 		super();
 		mContext = context;
